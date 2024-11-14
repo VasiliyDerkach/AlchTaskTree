@@ -12,7 +12,7 @@ from backend.db import Base
 from sqlalchemy.orm import  relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-def VCreateTask(request):
+def VCreateTask(request)
     if request.method == 'POST':
         form = CreateTask(request.POST)
         if form.is_valid():

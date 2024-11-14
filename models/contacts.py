@@ -1,4 +1,4 @@
-from backend.db import Base
+
 from sqlalchemy.orm import  relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
@@ -11,3 +11,4 @@ class Contacts(Base):
     last_name = Column(String)
     first_name = Column(String)
     second_name = Column(String)
+
