@@ -3,7 +3,7 @@ from sqlalchemy.orm import  relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Date
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-
+from models import *
 class Tasks(Base):
     __tablename__ = 'tasks'
     __table_args__ = {'keep_existing': True}

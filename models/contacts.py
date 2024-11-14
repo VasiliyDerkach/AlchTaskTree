@@ -3,6 +3,7 @@ from sqlalchemy.orm import  relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
+from models import *
 class Contacts(Base):
     __tablename__ = 'contacts'
     __table_args__ = {'keep_existing': True}

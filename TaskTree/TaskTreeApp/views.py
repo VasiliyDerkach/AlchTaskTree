@@ -2,9 +2,12 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import *
-from .models import *
+from sqlalchemy.orm import Session
+from sqlalchemy import insert, select, update, delete
+from backend.db_depends import get_db
 from django.shortcuts import render
 from django.db.models import Avg, Sum, Max
+from models import *
 from backend.db import Base
 from sqlalchemy.orm import  relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean

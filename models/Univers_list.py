@@ -1,6 +1,7 @@
 from backend.db import Base
 from sqlalchemy.orm import  relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from models import *
 class Univers_list(Base):
     __tablename__ = 'univers_list'
     __table_args__ = {'keep_existing': True}
