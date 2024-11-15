@@ -57,6 +57,7 @@ def MainPage(request,db: Annotated[Session, Depends(get_db)]):
         if id_del:
             # Tasks.objects.get(id=id_del).delete()
             db.execute(delete(Tasks).where(Tasks.id == id_del))
+            db.commit()
         # id_edit = request.POST.get('btn_del')
         # # print(id_del)
         # if id_edit:
@@ -163,40 +164,48 @@ def VCardTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
             if btn_find_tlink:
                 FindTitle = request.POST.get('FindTitle')
                 # print('FindTitle=',FindTitle)
-
+        search = "%{}%".format(FindTitle)
         if count_fulllink_task>0:
             # list_link_task = db.scalar(select(Univers_list).where(Univers_list.id_out == vtask_id))
             # lst_link_idin = [str(lst.id_in) for lst in list_link_task]
             # print('lst_link_idin=',lst_link_idin)
             # flist_link_task = Tasks.objects.filter(title__icontains=FindTitle, id__in=lst_link_idin)
-            search = "%{}%".format(FindTitle)
-            flist_link_task = db.query(Tasks).join(Univers_list, Tasks.id == Univers_list.id_in).filter(Tasks.title.like(search)).all()
 
-
-            # print(flist_link_task)
-            notlist_link_task = Tasks.objects.exclude(id__in=lst_link_idin).exclude(id=vtask_id).filter(title__icontains=FindTitleUnLink)
-            count_link_tasks = flist_link_task.count()
+            flist_link_task = db.query(Tasks).join(Univers_list, Tasks.id == Univers_list.id_in).filter(Univers_list.id_out == vtask_id).filter(Tasks.title.like(search)).all()
+            # notlist_link_task = Tasks.objects.exclude(id__in=lst_link_idin).exclude(id=vtask_id).filter(title__icontains=FindTitleUnLink)
+            notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == Univers_list.id_in).filter(Tasks.id != vtask_id).filter(Univers_list.id_out == vtask_id).filter(Univers_list.id_in == None).filter(Tasks.title.like(search)).all()
+            count_link_tasks = len(flist_link_task)
         else:
             flist_link_task = None
             notlist_link_task = Tasks.objects.exclude(id=vtask_id).filter(title__icontains=FindTitleUnLink)
+            notlist_link_task = db.query(Tasks).filter(Tasks.id != vtask_id).filter(Tasks.title.like(search)).all()
         count_unlink_tasks = notlist_link_task.count()
         if request.method == 'POST':
             btn_unlink = request.POST.get('btn_unlink')
             if btn_unlink:
-                Univers_list.objects.filter(id_in=btn_unlink,id_out=vtask_id).delete()
+                # Univers_list.objects.filter(id_in=btn_unlink,id_out=vtask_id).delete()
+                db.execute(delete(Univers_list).where(Univers_list.id_in==btn_unlink and Univers_list.id_out==vtask_id))
+                db.commit()
+
             btn_link = request.POST.get('btn_link')
             if btn_link:
                 # print(btn_link,vtask_id)
-                if Univers_list.objects.filter(id_in=btn_link, id_out=vtask_id, role='arrow'):
+                lstun = db.scalar(select(Univers_list).where(Univers_list.idd_in==btn_link and Univers_list.id_out==vtask_id and Univers_list.role=='arrow'))
+                # if Univers_list.objects.filter(id_in=btn_link, id_out=vtask_id, role='arrow'):
+                if lstun:
                     return HttpResponse("Задачи уже связаны")
                 else:
-                    max_indx = Univers_list.objects.filter(id_out=vtask_id, role='arrow').aggregate(Max('num_in_link'))
-                    max_indx_int = max_indx['num_in_link__max']
+                    # max_indx = Univers_list.objects.filter(id_out=vtask_id, role='arrow').aggregate(Max('num_in_link'))
+                    # max_indx_int = max_indx['num_in_link__max']
+                    max_indx_int = Univers_list.filter(Univers_list.id_out==vtask_id and  Univers_list.role=='arrow').query(func.max(Univers_list.id)).scalar()
                     if not max_indx_int:
                         max_indx_int = 0
                     max_indx_int += 1
                     # print(max_indx)
-                    Univers_list.objects.create(id_in=btn_link, id_out=vtask_id, num_in_link=max_indx_int, role='arrow')
+                    NewUlist = Univers_list(id_in=btn_link, id_out=vtask_id, num_in_link=max_indx_int, role='arrow')
+                    # Univers_list.objects.create(id_in=btn_link, id_out=vtask_id, num_in_link=max_indx_int, role='arrow')
+                    db.add(NewUlist)
+                    db.commit()
     else:
         return HttpResponse("Задача не найдена")
 
