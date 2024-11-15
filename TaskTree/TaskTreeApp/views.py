@@ -1,21 +1,21 @@
-from django.core.paginator import Paginator
-from django.shortcuts import render
+from re import search
+from sqlalchemy.sql import *
 from django.http import HttpResponse
 from .forms import *
-from sqlalchemy.orm import Session
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy.orm import *
+# from sqlalchemy import insert, select, update, delete, func
+from sqlalchemy import *
+
 from backend.db_depends import get_db
 from django.shortcuts import render
-from django.db.models import Avg, Sum, Max
 from models import *
-from backend.db import Base
 from fastapi import Depends
-from sqlalchemy.orm import  relationship
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import func
+
+# from sqlalchemy.orm import query
 from typing import Annotated
-def VCreateTask(request,db: Annotated[Session, Depends(get_db)]):
+db = Annotated[Session, Depends(get_db)]
+# db = get_db()
+def VCreateTask(request):
     if request.method == 'POST':
         form = CreateTask(request.POST)
         if form.is_valid():
@@ -23,7 +23,7 @@ def VCreateTask(request,db: Annotated[Session, Depends(get_db)]):
             task_start = form.cleaned_data['start']
             task_end = form.cleaned_data['end']
             # Tasks.objects.create(title=title, start=task_start, end=task_end)
-            VTask = Tasks(title=title, start=task_start, end=task_end)
+            VTask = Tasks(title=title, start=task_start, end=task_end) #id auto?
             db.add(VTask)
             db.commit()
 
@@ -32,7 +32,7 @@ def VCreateTask(request,db: Annotated[Session, Depends(get_db)]):
     cont_form={'form': form}
     return render(request, 'create_contact.html',context=cont_form)
 # Create your views here.
-def VCreateContact(request,db: Annotated[Session, Depends(get_db)]):
+def VCreateContact(request):
     if request.method == 'POST':
         form = CreateContact(request.POST)
         if form.is_valid():
@@ -47,7 +47,7 @@ def VCreateContact(request,db: Annotated[Session, Depends(get_db)]):
         form = CreateContact()
     cont_form={'form': form}
     return render(request, 'create_contact.html',context=cont_form)
-def MainPage(request,db: Annotated[Session, Depends(get_db)]):
+def MainPage(request):
     FindTitle = ''
     if request.method == 'POST':
         if request.POST.get('btn_find')=='new_find':
@@ -58,15 +58,9 @@ def MainPage(request,db: Annotated[Session, Depends(get_db)]):
             # Tasks.objects.get(id=id_del).delete()
             db.execute(delete(Tasks).where(Tasks.id == id_del))
             db.commit()
-        # id_edit = request.POST.get('btn_del')
-        # # print(id_del)
-        # if id_edit:
-        #     Tasks.objects.get(id=id_del).delete()
-
-    # tasks_lst = Tasks.objects.filter(title__icontains=FindTitle)
-    search = "%{}%".format(FindTitle)
-    tasks_lst = Tasks.query.filter(Tasks.tags.like(search)).all()
-    count_tasks = Tasks.query(func.count(Tasks.id)).scalar()
+    # t = db.query(Tasks)
+    tasks_lst = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%')).all()
+    count_tasks = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%')).query(func.count(Tasks.id)).scalar()
     # count_tasks = tasks_lst.count()
     if count_tasks == 0:
         PageStr = 'Нет задач соответствующих условиям'
@@ -75,7 +69,7 @@ def MainPage(request,db: Annotated[Session, Depends(get_db)]):
     info_main = {'PageTitle': PageStr, 'tasks_list': tasks_lst,
                  'count_tasks': count_tasks, 'FindTitle': FindTitle}
     return render(request, 'main.html', context=info_main)
-def PageContacts(request,db: Annotated[Session, Depends(get_db)]):
+def PageContacts(request):
     FindTitle = ''
     if request.method == 'POST':
         if request.POST.get('btn_find'):
@@ -100,7 +94,7 @@ def PageContacts(request,db: Annotated[Session, Depends(get_db)]):
     info_main = {'PageTitle': PageStr, 'contacts_lst': contacts_lst,
                  'count_contacts': count_contacts, 'FindTitle': FindTitle}
     return render(request, 'contacts.html', context=info_main)
-def VCardContact(request, contact_id,db: Annotated[Session, Depends(get_db)]):
+def VCardContact(request, contact_id):
 
     # VContact = Contacts.objects.get(id=contact_id)
     # print(VContact)
@@ -125,7 +119,7 @@ def VCardContact(request, contact_id,db: Annotated[Session, Depends(get_db)]):
                                                                      'first_name': vfirst_name,
                                                                      'second_name': vsecond_name}})
 
-def VEditTask(request, task_id,db: Annotated[Session, Depends(get_db)]):
+def VEditTask(request, task_id):
 
     vtitle, vstart, vend = db.scalar(select(Tasks.title,Tasks.start,Tasks.end).where(Tasks.id == task_id))
     if request.method == 'POST':
