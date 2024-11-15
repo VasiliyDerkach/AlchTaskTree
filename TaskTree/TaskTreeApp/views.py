@@ -7,6 +7,7 @@ from sqlalchemy.orm import *
 from sqlalchemy import *
 
 from backend.db_depends import get_db
+from backend.db import Base, engine
 from django.shortcuts import render
 from models import *
 from fastapi import Depends
@@ -14,6 +15,7 @@ from fastapi import Depends
 # from sqlalchemy.orm import query
 from typing import Annotated
 db = Annotated[Session, Depends(get_db)]
+# Base.metadata.create_all(engine)
 # db = get_db()
 def VCreateTask(request):
     if request.method == 'POST':
