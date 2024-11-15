@@ -137,6 +137,7 @@ def VEditTask(request, task_id,db: Annotated[Session, Depends(get_db)]):
         title = vtitle,
         start = vstart,
         end = vend))
+        db.commit()
         # print(request.POST.get('task_title'),request.POST.get('start'),request.POST.get('date_end'))
     FTask = { 'title': vtitle, 'start': vstart.strftime('%Y-%m-%d'), 'end': vend.strftime('%Y-%m-%d') }
 
@@ -191,7 +192,7 @@ def VCardTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
             btn_link = request.POST.get('btn_link')
             if btn_link:
                 # print(btn_link,vtask_id)
-                lstun = db.scalar(select(Univers_list).where(Univers_list.idd_in==btn_link and Univers_list.id_out==vtask_id and Univers_list.role=='arrow'))
+                lstun = db.scalar(select(Univers_list).where(Univers_list.id==btn_link ))
                 # if Univers_list.objects.filter(id_in=btn_link, id_out=vtask_id, role='arrow'):
                 if lstun:
                     return HttpResponse("Задачи уже связаны")
@@ -227,7 +228,8 @@ def VContactsTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
     # if vtask_id==task_id:
     FindTitleUnLink = ''
     FindTitle = ''
-    lst_contacts_rol = []
+    # lst_contacts_rol = []
+    notlist_link_task = None
     if vtask_id:
         count_fulllink_task = Univers_list.filter(Univers_list.id_out == vtask_id).query(func.count(Univers_list.id)).scalar()
         link_task = Univers_list.objects.filter(id_out=vtask_id)
@@ -255,22 +257,31 @@ def VContactsTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
             flist_link_task = None
         search1 = "%{}%".format(FindTitleUnLink)
         notlist_link_task = db.query(Contacts).filter(Contacts.last_name.like(search1)).all()
+
         count_unlink_tasks = len(notlist_link_task)
         if request.method == 'POST':
             btn_unlink = request.POST.get('btn_unlink')
             if btn_unlink:
                 Univers_list.objects.filter(id=btn_unlink).delete()
+                db.execute(delete(Univers_list).where(Univers_list.id==btn_unlink ))
+                db.commit()
+
             btn_link = request.POST.get('btn_link')
             btn_role = request.POST.get('btn_role')
             if btn_role:
                 # print(vrole)
                 vrole = request.POST.get(f"contact_role>{btn_role}")
-                Univers_list.objects.filter(id=btn_role).update(role=vrole)
+                # Univers_list.objects.filter(id=Univers_list).update(role=vrole)
+                db.execute(update(Univers_list).where(Univers_list.id==Univers_list).values(role=vrole)
+                db.commit()
             else:
                 vrole = ''
 
             if btn_link:
-                    Univers_list.objects.create(id_in=btn_link, id_out=vtask_id, num_in_link=0, role=vrole)
+                NewUList = Univers_list(id_in=btn_link, id_out=vtask_id, num_in_link=0, role=vrole)
+                # Univers_list.objects.create(id_in=btn_link, id_out=vtask_id, num_in_link=0, role=vrole)
+                db.add(NewUList)
+                db.commit()
     else:
         return HttpResponse("Задача не найдена")
 
