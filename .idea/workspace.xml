@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3989257c-69e7-429d-ba04-f43b086e122d" name="Changes" comment="1511-2">
+    <list default="true" id="3989257c-69e7-429d-ba04-f43b086e122d" name="Changes" comment="1511-print code">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TaskTree/TaskTreeApp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/TaskTree/TaskTreeApp/views.py" afterDir="false" />
     </list>
@@ -112,7 +112,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731670451244</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="1511-print code">
+      <option name="closed" value="true" />
+      <created>1731671099374</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1731671099374</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -122,6 +130,7 @@
     <MESSAGE value="1511" />
     <MESSAGE value="1511-1" />
     <MESSAGE value="1511-2" />
-    <option name="LAST_COMMIT_MESSAGE" value="1511-2" />
+    <MESSAGE value="1511-print code" />
+    <option name="LAST_COMMIT_MESSAGE" value="1511-print code" />
   </component>
 </project>

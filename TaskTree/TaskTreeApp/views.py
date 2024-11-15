@@ -15,7 +15,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import func
 from typing import Annotated
-def VCreateTask(request,db: Annotated[Session, Depends(get_db)])
+def VCreateTask(request,db: Annotated[Session, Depends(get_db)]):
     if request.method == 'POST':
         form = CreateTask(request.POST)
         if form.is_valid():
@@ -272,7 +272,7 @@ def VContactsTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
                 # print(vrole)
                 vrole = request.POST.get(f"contact_role>{btn_role}")
                 # Univers_list.objects.filter(id=Univers_list).update(role=vrole)
-                db.execute(update(Univers_list).where(Univers_list.id==Univers_list).values(role=vrole)
+                db.execute(update(Univers_list).where(Univers_list.id==Univers_list).values(role=vrole))
                 db.commit()
             else:
                 vrole = ''
