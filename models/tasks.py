@@ -1,4 +1,4 @@
-# from backend.db import Base
+from backend.db import Base,engine
 from sqlalchemy.orm import  relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, Date
 from sqlalchemy.dialects.postgresql import UUID
@@ -11,3 +11,7 @@ class Tasks(Base):
     title = Column(Text)
     start =  Column(Date)
     end =  Column(Date)
+
+# from sqlalchemy.schema import CreateTable
+# CreateTable(Tasks.__table__)
+Base.metadata.create_all(engine,tables=[Tasks.__table__])

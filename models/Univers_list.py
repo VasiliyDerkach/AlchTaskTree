@@ -1,4 +1,4 @@
-# from backend.db import Base
+from backend.db import Base,engine
 from sqlalchemy.orm import  relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from models import *
@@ -10,3 +10,8 @@ class Univers_list(Base):
     id_in = Column(String)
     num_in_link = Column(Integer)
     role = Column(String)
+
+# from sqlalchemy.schema import CreateTable
+# CreateTable(Univers_list.__table__)
+# Base.metadata.create_all(engine)
+Base.metadata.create_all(engine,tables=[Univers_list.__table__])
