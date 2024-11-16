@@ -1,7 +1,6 @@
-from backend.db import engine, Base
+from ..backend.db import Base, engine
 from sqlalchemy import Column, Text, Date
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import *
 # from sqlalchemy import *
 import uuid
 class Tasks(Base):

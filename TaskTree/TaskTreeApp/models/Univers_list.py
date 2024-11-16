@@ -1,4 +1,4 @@
-from backend.db import engine, Base
+from ..backend.db import engine, Base
 from sqlalchemy import Column, Integer, String
 
 

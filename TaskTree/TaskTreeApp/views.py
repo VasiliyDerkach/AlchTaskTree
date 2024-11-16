@@ -9,22 +9,22 @@
     Передает в таблицу Contacts поля Фамилия - last_name, Имя - firs_name, Отчество - secjnd_name.
 
 """
-from re import search
-from sqlalchemy.sql import *
 from django.http import HttpResponse
 from .forms import *
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import *
 # from sqlalchemy import insert, select, update, delete, func
 from sqlalchemy import *
 # from pydantic import BaseModel
-from backend.db_depends import get_db
-from backend.db import Base, engine
+from .backend.db_depends import get_db
 from django.shortcuts import render
-from models import *
+from .models import *
 from fastapi import Depends
-
 # from sqlalchemy.orm import query
 from typing import Annotated
+
+
+
+
 db = Annotated[Session, Depends(get_db)]
 # Base.metadata.create_all(engine)
 # db = get_db()
@@ -156,7 +156,7 @@ def VEditTask(request, task_id):
 
     return render(request, 'edit_task.html', context={'task': FTask})
 
-def VCardTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
+def VCardTask(request, task_id):
     # find_task = Tasks.objects.filter(id=task_id)
     # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
     VTask = db.query(Tasks).filter(Tasks.id == task_id).all()[0]
