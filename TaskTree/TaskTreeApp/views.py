@@ -1,11 +1,22 @@
+""""
+    модуль views.py
+    Содержит представления для реализаии проекта AlchTaskTree
+    VCreateTask(request) - функция представления, вызывающая форму Django, для создания новой записи задачи (Tasks).
+    Передает в таблицу Tasks поля Текст задачи (title), Дата начала выполнения задачи Start,
+    Дата завершения задачи End.
+
+    VCreateContact(request) - функция, вызывающая форму Django, для создания новой записи в таблице Контакты (Ckntacts).
+    Передает в таблицу Contacts поля Фамилия - last_name, Имя - firs_name, Отчество - secjnd_name.
+
+"""
 from re import search
 from sqlalchemy.sql import *
 from django.http import HttpResponse
 from .forms import *
-from sqlalchemy.orm import *
+from sqlalchemy.orm import Session
 # from sqlalchemy import insert, select, update, delete, func
 from sqlalchemy import *
-
+# from pydantic import BaseModel
 from backend.db_depends import get_db
 from backend.db import Base, engine
 from django.shortcuts import render
@@ -61,6 +72,7 @@ def MainPage(request):
             db.execute(delete(Tasks).where(Tasks.id == id_del))
             db.commit()
     # t = db.query(Tasks)
+    # tasks_lst = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%'))
     tasks_lst = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%')).all()
     count_tasks = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%')).query(func.count(Tasks.id)).scalar()
     # count_tasks = tasks_lst.count()
@@ -98,11 +110,11 @@ def PageContacts(request):
     return render(request, 'contacts.html', context=info_main)
 def VCardContact(request, contact_id):
 
-    # VContact = Contacts.objects.get(id=contact_id)
+    VContact = db.query(Contacts).filter(Contacts.id == contact_id).all()[0]
     # print(VContact)
-    vlast_name =''
-    vfirst_name = ''
-    vsecond_name =''
+    vlast_name = VContact['last_name']
+    vfirst_name = VContact['first_name']
+    vsecond_name = VContact['second_name']
     if request.method == 'POST':
         # VContact.last_name = request.POST.get('last_name')
         # VContact.first_name = request.POST.get('first_name')
@@ -122,8 +134,13 @@ def VCardContact(request, contact_id):
                                                                      'second_name': vsecond_name}})
 
 def VEditTask(request, task_id):
+    VTask = db.query(Tasks).filter(Tasks.id == task_id).all()[0]
+    # vtask_id = VTask['id']
+    vtitle = VTask['title']
+    vstart = VTask['start']
+    vend  = VTask['end']
 
-    vtitle, vstart, vend = db.scalar(select(Tasks.title,Tasks.start,Tasks.end).where(Tasks.id == task_id))
+    # vtitle, vstart, vend = db.scalar(select(Tasks.title,Tasks.start,Tasks.end).where(Tasks.id == task_id))
     if request.method == 'POST':
         vtitle = request.POST.get('task_title')
         vstart = request.POST.get('start')
@@ -141,7 +158,12 @@ def VEditTask(request, task_id):
 
 def VCardTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
     # find_task = Tasks.objects.filter(id=task_id)
-    vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
+    # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
+    VTask = db.query(Tasks).filter(Tasks.id == task_id).all()[0]
+    vtask_id = VTask['id']
+    vtask_title = VTask['title']
+    vtask_start  = VTask['start']
+    vtask_end = VTask['end']
     count_link_tasks = 0
     count_unlink_tasks = 0
     FindTitleUnLink = ''
@@ -213,9 +235,15 @@ def VCardTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
                  'FindTitle': FindTitle,
                  'count_link_tasks': count_link_tasks,'count_unlink_tasks': count_unlink_tasks}
     return render(request,'card_task.html',context=info_task)
-def VContactsTask(request, task_id, db: Annotated[Session, Depends(get_db)]):
-    vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
+def VContactsTask(request, task_id):
+    # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
     # find_task = Tasks.objects.filter(id=task_id)
+    VTask = db.query(Tasks).filter(Tasks.id == task_id).all()[0]
+    vtask_id = VTask['id']
+    vtask_title = VTask['title']
+    vtask_start = VTask['start']
+    vtask_end = VTask['end']
+
     lst_field_task = {'task_id': vtask_id, 'task_title': vtask_title, 'task_start': vtask_start, 'task_end': vtask_end}
     count_link_tasks = 0
     count_unlink_tasks = 0
