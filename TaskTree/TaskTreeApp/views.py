@@ -11,21 +11,18 @@
 """
 from django.http import HttpResponse
 from .forms import *
-from sqlalchemy.orm import *
-# from sqlalchemy import insert, select, update, delete, func
 from sqlalchemy import *
-# from pydantic import BaseModel
-from .backend.db_depends import get_db
+from .backend.db import SessionLocal
 from django.shortcuts import render
 from .models import *
-from fastapi import Depends
-# from sqlalchemy.orm import query
+# from fastapi import Depends
+from sqlalchemy.orm import *
 from typing import Annotated
 
 
 
 
-db = Annotated[Session, Depends(get_db)]
+db = SessionLocal
 # Base.metadata.create_all(engine)
 # db = get_db()
 def VCreateTask(request):
