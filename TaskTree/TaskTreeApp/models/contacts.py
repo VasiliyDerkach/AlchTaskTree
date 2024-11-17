@@ -1,8 +1,14 @@
+"""
+    Модуль models.contacts.py
+
+    Модель таблицы Контакты (Contacts).
+    поля Фамилия - last_name, Имя - first_name, Отчество - second_name.
+    ключевое поле id - 36 значная строка формата uuid
+"""
 from ..backend.db import engine, Base
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-
 
 class Contacts(Base):
     __tablename__ = 'contacts'
@@ -12,6 +18,4 @@ class Contacts(Base):
     first_name = Column(String)
     second_name = Column(String)
 
-# from sqlalchemy.schema import CreateTable
-# CreateTable(Contacts.__table__)
 Base.metadata.create_all(engine,tables=[Contacts.__table__])

@@ -1,3 +1,11 @@
+"""
+    Модуль models.tasks.py
+    Задает модель таблицы Tasks
+    поля Текст задачи (title),
+    Дата начала выполнения задачи Start,
+    Дата завершения задачи End.
+    ключевое поле id - 36 значная строка формата uuid
+"""
 from ..backend.db import Base, engine
 from sqlalchemy import Column, Text, Date
 from sqlalchemy.dialects.postgresql import UUID
