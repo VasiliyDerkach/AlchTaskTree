@@ -149,7 +149,7 @@ def PageContacts(request):
         # print(id_del)
         if id_del:
             # Contacts.objects.get(id=id_del).delete()
-            DContact = db.query(Contacts).filter(Contacts.id == id_del).first()
+            DContact = db.query(Contacts).filter(Contacts.id == uuid.UUID(id_del))
             # db.execute(delete(Contacts).where(Contacts.id == id_del))
             db.delete(DContact)
             db.commit()
@@ -170,7 +170,7 @@ def PageContacts(request):
     return render(request, 'contacts.html', context=info_main)
 def VCardContact(request, contact_id):
 
-    VContact = db.query(Contacts).filter(Contacts.id == contact_id).all()[0]
+    VContact = db.query(Contacts).filter(Contacts.id == uuid.UUID(contact_id)).all()[0]
     # print(VContact)
     vlast_name = VContact['last_name']
     vfirst_name = VContact['first_name']
@@ -188,7 +188,7 @@ def VCardContact(request, contact_id):
         #     last_name=vlast_name,
         #     second_name=vsecond_name
         # ))
-        UpContact = db.query(Contacts).filter(Contacts.id == contact_id).first()
+        UpContact = db.query(Contacts).filter(Contacts.id == uuid.UUID(contact_id)).all()[0]
         UpContact.last_name = vlast_name
         UpContact.first_name = vfirst_name
         UpContact.second_name = vsecond_name
@@ -198,7 +198,7 @@ def VCardContact(request, contact_id):
                                                                      'second_name': vsecond_name}})
 
 def VEditTask(request, task_id):
-    VTask = db.query(Tasks).filter(Tasks.id == task_id).all()[0]
+    VTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).all()[0]
     # vtask_id = VTask['id']
     vtitle = VTask['title']
     vstart = VTask['start']
@@ -213,7 +213,7 @@ def VEditTask(request, task_id):
         # title = vtitle,
         # start = vstart,
         # end = vend))
-        UpTask = db.query(Tasks).filter(Tasks.id == task_id).first()
+        UpTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).first()
         UpTask.title = vtitle
         UpTask.start = vstart
         UpTask.end = vend
@@ -226,7 +226,7 @@ def VEditTask(request, task_id):
 def VCardTask(request, task_id):
     # find_task = Tasks.objects.filter(id=task_id)
     # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
-    VTask = db.query(Tasks).filter(Tasks.id == task_id).all()[0]
+    VTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).all()[0]
     vtask_id = VTask['id']
     vtask_title = VTask['title']
     vtask_start  = VTask['start']
@@ -255,13 +255,13 @@ def VCardTask(request, task_id):
                 # print('FindTitle=',FindTitle)
         search = "%{}%".format(FindTitle)
         if count_fulllink_task>0:
-            flist_link_task = db.query(Tasks).join(Univers_list, Tasks.id == Univers_list.id_in).filter(Univers_list.id_out == vtask_id).filter(Tasks.title.like(search)).all()
+            flist_link_task = db.query(Tasks).join(Univers_list, Tasks.id == uuid.UUID(Univers_list.id_in)).filter(Univers_list.id_out == uuid.UUID(vtask_id)).filter(Tasks.title.like(search)).all()
             # notlist_link_task = Tasks.objects.exclude(id__in=lst_link_idin).exclude(id=vtask_id).filter(title__icontains=FindTitleUnLink)
-            notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == Univers_list.id_in).filter(Tasks.id != vtask_id).filter(Univers_list.id_out == vtask_id).filter(Univers_list.id_in == None).filter(Tasks.title.like(search)).all()
+            notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == uuid.UUID(Univers_list.id_in)).filter(Tasks.id != uuid.UUID(vtask_id)).filter(Univers_list.id_out == uuid.UUID(vtask_id)).filter(Univers_list.id_in == None).filter(Tasks.title.like(search)).all()
             count_link_tasks = len(flist_link_task)
         else:
             flist_link_task = None
-            notlist_link_task = Tasks.objects.exclude(id=vtask_id).filter(title__icontains=FindTitleUnLink)
+            # notlist_link_task = db.query(Tasks).filter(Tasks.id != uuid.UUID(vtask_id)).filter(Tasks.title.ilike(FindTitleUnLink))
             search1 = "%{}%".format(FindTitleUnLink)
             notlist_link_task = db.query(Tasks).filter(Tasks.id != vtask_id).filter(Tasks.title.like(search1)).all()
         count_unlink_tasks = len(notlist_link_task)
@@ -269,7 +269,7 @@ def VCardTask(request, task_id):
             btn_unlink = request.POST.get('btn_unlink')
             if btn_unlink:
                 # Univers_list.objects.filter(id_in=btn_unlink,id_out=vtask_id).delete()
-                DUList = db.query(Univers_list).filter(Univers_list.id==btn_unlink).forst()
+                DUList = db.query(Univers_list).filter(Univers_list.id==btn_unlink).first()
                 # db.execute(delete(Univers_list).where(Univers_list.id_in==btn_unlink and Univers_list.id_out==vtask_id))
                 db.delete(DUList)
                 db.commit()
@@ -285,7 +285,9 @@ def VCardTask(request, task_id):
                 else:
                     # max_indx = Univers_list.objects.filter(id_out=vtask_id, role='arrow').aggregate(Max('num_in_link'))
                     # max_indx_int = max_indx['num_in_link__max']
-                    max_indx_int = Univers_list.filter(Univers_list.id_out==vtask_id and  Univers_list.role=='arrow').query(func.max(Univers_list.id)).scalar()
+                    # lst3 = db.query(Univers_list).filter(Univers_list.id_out == vtask_id ,  Univers_list.role=='arrow').query(func.max(Univers_list.id)).scalar()
+                    lst3 = db.query(Univers_list).filter(Univers_list.id_out == vtask_id ,  Univers_list.role=='arrow').all()
+                    max_indx_int = len(lst3)
                     if not max_indx_int:
                         max_indx_int = 0
                     max_indx_int += 1
@@ -306,7 +308,7 @@ def VCardTask(request, task_id):
 def VContactsTask(request, task_id):
     # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
     # find_task = Tasks.objects.filter(id=task_id)
-    VTask = db.query(Tasks).filter(Tasks.id == task_id).all()[0]
+    VTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).all()[0]
     vtask_id = VTask['id']
     vtask_title = VTask['title']
     vtask_start = VTask['start']
@@ -341,7 +343,7 @@ def VContactsTask(request, task_id):
             # lst_link_idin = [str(lst.id_in) for lst in list_link_task]
             # flist_link_task = Contacts.objects.filter(last_name__icontains=FindTitle, id__in=lst_link_idin)
             # count_link_tasks = flist_link_task.count()
-            flist_link_task = db.query(Contacts).join(Univers_list, Contacts.id == Univers_list.id_in).filter(Univers_list.id_out == vtask_id).filter(Contacts.last_name.like(search)).all()
+            flist_link_task = db.query(Contacts).join(Univers_list, Contacts.id == uuid.UUID(Univers_list.id_in)).filter(Univers_list.id_out == vtask_id).filter(Contacts.last_name.like(search)).all()
             # notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == Univers_list.id_in).filter(Tasks.id != vtask_id).filter(Univers_list.id_out == vtask_id).filter(Univers_list.id_in == None).filter(Tasks.title.like(search)).all()
             count_link_tasks = len(flist_link_task)
 
