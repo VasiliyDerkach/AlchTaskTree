@@ -61,6 +61,8 @@
     и аналогично по списку несвязанных контактов.
 
 """
+import uuid
+
 from django.http import HttpResponse
 from .forms import *
 from sqlalchemy import *
@@ -113,13 +115,21 @@ def MainPage(request):
         # print(id_del)
         if id_del:
             # Tasks.objects.get(id=id_del).delete()
-            Dtask = db.query(Tasks).filter(Tasks.id == id_del).first()
-            # db.execute(delete(Tasks).where(Tasks.id == id_del))
-            db.delete(Dtask)
+            # print('UID(id_del=',UUID(id_del),type(UUID(id_del)))
+            # d =select(Tasks).where(Tasks.id == id_del).as_scalar
+            # id_del_u = UUID(id_del)
+            # Dtask = db.query(Tasks).filter(Tasks.id == id_del_u)
+            # print(d)
+            # print(Dtask.all())
+
+            db.execute(delete(Tasks).where(Tasks.id == uuid.UUID(id_del)))
+            # db.delete(Dtask)
             db.commit()
     # t = db.query(Tasks)
     # tasks_lst = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%'))
     tasks_lst = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%')).all()
+
+    # print('id=',tasks_lst[0].id,type(tasks_lst[0].id))
     count_tasks = len(tasks_lst)
     # count_tasks = db.query(func.count(Tasks.id)).filter(Tasks.title.ilike(f'%{FindTitle}%')).scalar()
     # count_tasks = tasks_lst.count()
