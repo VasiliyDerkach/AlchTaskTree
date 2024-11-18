@@ -249,9 +249,11 @@ def VCardTask(request, task_id):
             btn_find_unlink = request.POST.get('btn_find_unlink')
             if btn_find_unlink:
                 FindTitleUnLink = request.POST.get('FindTitleUnlink')
+                btn_find_unlink = None
             btn_find_tlink = request.POST.get('btn_find_tsklink')
             if btn_find_tlink:
                 FindTitle = request.POST.get('FindTitle')
+                btn_find_tlink = None
                 # print('FindTitle=',FindTitle)
         search = "%{}%".format(FindTitle)
         if count_fulllink_task>0:
@@ -273,6 +275,7 @@ def VCardTask(request, task_id):
                 # db.execute(delete(Univers_list).where(Univers_list.id_in==btn_unlink and Univers_list.id_out==vtask_id))
                 db.delete(DUList)
                 db.commit()
+                btn_unlink = None
 
             btn_link = request.POST.get('btn_link')
             if btn_link:
@@ -296,6 +299,7 @@ def VCardTask(request, task_id):
                     # Univers_list.objects.create(id_in=btn_link, id_out=vtask_id, num_in_link=max_indx_int, role='arrow')
                     db.add(NewUlist)
                     db.commit()
+                btn_link = None
     else:
         return HttpResponse("Задача не найдена")
 
@@ -332,9 +336,11 @@ def VContactsTask(request, task_id):
             btn_find_unlink = request.POST.get('btn_find_unlink')
             if btn_find_unlink:
                 FindTitleUnLink = request.POST.get('FindTitleUnlink')
+                btn_find_unlink = None
             btn_find_tlink = request.POST.get('btn_find_tsklink')
             if btn_find_tlink:
                 FindTitle = request.POST.get('FindTitle')
+                btn_find_tlink = None
                 # print('FindTitle=',FindTitle)
         search = "%{}%".format(FindTitle)
         if count_fulllink_task>0:
@@ -361,6 +367,7 @@ def VContactsTask(request, task_id):
                 DUList = db.query(Univers_list).filter(Univers_list.id==btn_unlink).first()
                 db.delete(DUList)
                 db.commit()
+                btn_unlink = None
 
             btn_link = request.POST.get('btn_link')
             btn_role = request.POST.get('btn_role')
@@ -371,6 +378,7 @@ def VContactsTask(request, task_id):
                 UpUList = db.query(Univers_list).filter(Univers_list.id==btn_role).first()
                 UpUList.role = vrole
                 db.commit()
+                btn_role = None
             else:
                 vrole = ''
 
@@ -379,6 +387,7 @@ def VContactsTask(request, task_id):
                 # Univers_list.objects.create(id_in=btn_link, id_out=vtask_id, num_in_link=0, role=vrole)
                 db.add(NewUList)
                 db.commit()
+                btn_link = None
     else:
         return HttpResponse("Задача не найдена")
 
