@@ -70,7 +70,7 @@ from .backend.db import SessionLocal, DBSession
 from django.shortcuts import render
 from .models import *
 from sqlalchemy.orm import *
-
+from datetime import *
 db = DBSession
 # Base.metadata.create_all(engine)
 # db = get_db()
@@ -114,21 +114,14 @@ def MainPage(request):
         id_del = request.POST.get('btn_del')
         # print(id_del)
         if id_del:
-            # Tasks.objects.get(id=id_del).delete()
-            # print('UID(id_del=',UUID(id_del),type(UUID(id_del)))
-            # d =select(Tasks).where(Tasks.id == id_del).as_scalar
-            # id_del_u = UUID(id_del)
-            # Dtask = db.query(Tasks).filter(Tasks.id == id_del_u)
-            # print(d)
-            # print(Dtask.all())
-
             db.execute(delete(Tasks).where(Tasks.id == uuid.UUID(id_del)))
             # db.delete(Dtask)
             db.commit()
     # t = db.query(Tasks)
     # tasks_lst = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%'))
     tasks_lst = db.query(Tasks).filter(Tasks.title.ilike(f'%{FindTitle}%')).all()
-
+    # for h in tasks_lst:
+    #     print(h.start)
     # print('id=',tasks_lst[0].id,type(tasks_lst[0].id))
     count_tasks = len(tasks_lst)
     # count_tasks = db.query(func.count(Tasks.id)).filter(Tasks.title.ilike(f'%{FindTitle}%')).scalar()
@@ -172,9 +165,9 @@ def VCardContact(request, contact_id):
 
     VContact = db.query(Contacts).filter(Contacts.id == uuid.UUID(contact_id)).all()[0]
     # print(VContact)
-    vlast_name = VContact['last_name']
-    vfirst_name = VContact['first_name']
-    vsecond_name = VContact['second_name']
+    vlast_name = VContact.last_name
+    vfirst_name = VContact.first_name
+    vsecond_name = VContact.second_name
     if request.method == 'POST':
         # VContact.last_name = request.POST.get('last_name')
         # VContact.first_name = request.POST.get('first_name')
@@ -198,13 +191,13 @@ def VCardContact(request, contact_id):
                                                                      'second_name': vsecond_name}})
 
 def VEditTask(request, task_id):
-    VTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).all()[0]
-    # vtask_id = VTask['id']
-    vtitle = VTask['title']
-    vstart = VTask['start']
-    vend  = VTask['end']
-
-    # vtitle, vstart, vend = db.scalar(select(Tasks.title,Tasks.start,Tasks.end).where(Tasks.id == task_id))
+    VTask = db.query(Tasks).filter_by(id = uuid.UUID(task_id)).all()
+    # for u in VTask:
+    #     print('u=',u)
+    # print('VTask=',VTask)
+    vtitle = VTask[0].title
+    vstart = VTask[0].start
+    vend  = VTask[0].end
     if request.method == 'POST':
         vtitle = request.POST.get('task_title')
         vstart = request.POST.get('start')
@@ -216,7 +209,11 @@ def VEditTask(request, task_id):
         UpTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).first()
         UpTask.title = vtitle
         UpTask.start = vstart
+        if UpTask.start=='':
+            UpTask.start = None
         UpTask.end = vend
+        if UpTask.end=='':
+            UpTask.end = None
         db.commit()
         # print(request.POST.get('task_title'),request.POST.get('start'),request.POST.get('date_end'))
     FTask = { 'title': vtitle, 'start': vstart.strftime('%Y-%m-%d'), 'end': vend.strftime('%Y-%m-%d') }
@@ -227,10 +224,10 @@ def VCardTask(request, task_id):
     # find_task = Tasks.objects.filter(id=task_id)
     # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
     VTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).all()[0]
-    vtask_id = VTask['id']
-    vtask_title = VTask['title']
-    vtask_start  = VTask['start']
-    vtask_end = VTask['end']
+    vtask_id = VTask.id
+    vtask_title = VTask.title
+    vtask_start  = VTask.start
+    vtask_end = VTask.end
     count_link_tasks = 0
     count_unlink_tasks = 0
     FindTitleUnLink = ''
@@ -242,7 +239,7 @@ def VCardTask(request, task_id):
         # link_task =  db.scalar(select(Univers_list).where(Univers_list.id_out == vtask_id))
         # count_fulllink_task = Univers_list.filter(Univers_list.id_out == vtask_id).query(
         #     func.count(Univers_list.id)).scalar()
-        count_fulllink_task = len(Univers_list.filter(Univers_list.id_out == vtask_id).all())
+        count_fulllink_task = len(db.query(Univers_list).filter(Univers_list.id_out == vtask_id).all())
 
         # count_fulllink_task = link_task.count()
         if request.method == 'POST':
@@ -313,10 +310,10 @@ def VContactsTask(request, task_id):
     # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
     # find_task = Tasks.objects.filter(id=task_id)
     VTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).all()[0]
-    vtask_id = VTask['id']
-    vtask_title = VTask['title']
-    vtask_start = VTask['start']
-    vtask_end = VTask['end']
+    vtask_id = VTask.id
+    vtask_title = VTask.title
+    vtask_start = VTask.start
+    vtask_end = VTask.end
 
     lst_field_task = {'task_id': vtask_id, 'task_title': vtask_title, 'task_start': vtask_start, 'task_end': vtask_end}
     count_link_tasks = 0
