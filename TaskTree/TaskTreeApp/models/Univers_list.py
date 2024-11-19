@@ -19,13 +19,14 @@
 """
 from ..backend.db import engine, Base
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.dialects.postgresql import UUID
 
 class Univers_list(Base):
     __tablename__ = 'Univers_list'
     __table_args__ = {'keep_existing': True}
     id = Column(Integer, primary_key=True, index=True)
-    id_out =Column(String)
-    id_in = Column(String)
+    id_out =Column(UUID(as_uuid=True))
+    id_in = Column(UUID(as_uuid=True))
     num_in_link = Column(Integer)
     role = Column(String)
 
