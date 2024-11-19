@@ -267,13 +267,10 @@ def VCardTask(request, task_id):
         search1 = "%{}%".format(FindTitleUnLink)
         if count_fulllink_task>0:
             flist_link_task = db.query(Tasks).join(Univers_list, Tasks.id == Univers_list.id_in)
-            flist_link_task = flist_link_task.filter(Univers_list.id_out == vtask_id and Tasks.title.like(search))
+            flist_link_task = flist_link_task.filter(Univers_list.id_out == vtask_id , Tasks.title.like(search))
             flist_link_task = flist_link_task.add_columns(Tasks.id,Tasks.title,Univers_list.id_num).all()
             # flist_link_task = flist_link_task.join(Univers_list, Tasks.id == Univers_list.id_in).all()
-            # print('dict',flist_link_task[0].__dict__)
-            # db.query(Tasks).
-
-            notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == Univers_list.id_in).filter( Tasks.id!=vtask_id, Univers_list.id_in == null(),Tasks.title.like(search)).all()
+            notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == Univers_list.id_in).filter( Tasks.id!=vtask_id, Univers_list.id_in == null(),Tasks.title.like(search1)).all()
             count_link_tasks = len(flist_link_task)
         else:
             flist_link_task = None
