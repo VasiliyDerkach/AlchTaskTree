@@ -70,7 +70,7 @@ from .backend.db import SessionLocal, DBSession
 from django.shortcuts import render
 from .models import *
 from sqlalchemy.orm import *
-from datetime import *
+from datetime import datetime
 db = DBSession
 # Base.metadata.create_all(engine)
 # db = get_db()
@@ -198,25 +198,35 @@ def VEditTask(request, task_id):
     vtitle = VTask[0].title
     vstart = VTask[0].start
     vend  = VTask[0].end
+
     if request.method == 'POST':
         vtitle = request.POST.get('task_title')
         vstart = request.POST.get('start')
         vend = request.POST.get('date_end')
         # db.execute(update(Tasks).where(Tasks.id == task_id).values(
         # title = vtitle,
-        # start = vstart,
+        # print(type(vstart),vstart)
         # end = vend))
         UpTask = db.query(Tasks).filter(Tasks.id == uuid.UUID(task_id)).first()
         UpTask.title = vtitle
         UpTask.start = vstart
         if UpTask.start=='':
-            UpTask.start = None
+            UpTask.start = null()
+        else:
+            UpTask.start = datetime.strptime(vstart,'%Y-%m-%d')
         UpTask.end = vend
         if UpTask.end=='':
-            UpTask.end = None
+            UpTask.end = null()
+        else:
+            UpTask.end = datetime.strptime(vend,'%Y-%m-%d')
         db.commit()
         # print(request.POST.get('task_title'),request.POST.get('start'),request.POST.get('date_end'))
-    FTask = { 'title': vtitle, 'start': vstart.strftime('%Y-%m-%d'), 'end': vend.strftime('%Y-%m-%d') }
+    else:
+        if vstart:
+            vstart = vstart.strftime('%Y-%m-%d')
+        if vend:
+            vend = vend.strftime('%Y-%m-%d')
+    FTask = {'title': vtitle, 'start': vstart, 'end': vend }
 
     return render(request, 'edit_task.html', context={'task': FTask})
 
@@ -256,7 +266,8 @@ def VCardTask(request, task_id):
         if count_fulllink_task>0:
             flist_link_task = db.query(Tasks).join(Univers_list, Tasks.id == uuid.UUID(Univers_list.id_in)).filter(Univers_list.id_out == uuid.UUID(vtask_id)).filter(Tasks.title.like(search)).all()
             # notlist_link_task = Tasks.objects.exclude(id__in=lst_link_idin).exclude(id=vtask_id).filter(title__icontains=FindTitleUnLink)
-            notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == uuid.UUID(Univers_list.id_in)).filter(Tasks.id != uuid.UUID(vtask_id)).filter(Univers_list.id_out == uuid.UUID(vtask_id)).filter(Univers_list.id_in == None).filter(Tasks.title.like(search)).all()
+            notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == uuid.UUID(Univers_list.id_in)).filter(Tasks.id != uuid.UUID(vtask_id)).filter(Univers_list.id_out == uuid.UUID(vtask_id)).filter(Univers_list.id_in == null()).filter(Tasks.title.like(search)).all()
+            notlist_link_task = db.query(Tasks).outerjoin(Univers_list, Tasks.id == uuid.UUID(Univers_list.id_in)).filter(Tasks.id != uuid.UUID(vtask_id)).filter(Univers_list.id_out == uuid.UUID(vtask_id)).filter(Univers_list.id_in == null()).filter(Tasks.title.like(search)).all()
             count_link_tasks = len(flist_link_task)
         else:
             flist_link_task = None
@@ -278,7 +289,8 @@ def VCardTask(request, task_id):
             if btn_link:
                 # print(btn_link,vtask_id)
                 # lstun = db.scalar(select(Univers_list).where(Univers_list.id==btn_link ))
-                lstun = db.query(Univers_list).filter(Univers_list.id==btn_link)
+                lstun = db.query(Univers_list).filter(Univers_list.id_in==btn_link, Univers_list.id_out==str(vtask_id),
+                                                      Univers_list.role=='arrow').all()
                 # if Univers_list.objects.filter(id_in=btn_link, id_out=vtask_id, role='arrow'):
                 if lstun:
                     return HttpResponse("Задачи уже связаны")
@@ -292,7 +304,7 @@ def VCardTask(request, task_id):
                         max_indx_int = 0
                     max_indx_int += 1
                     # print(max_indx)
-                    NewUlist = Univers_list(id_in=btn_link, id_out=vtask_id, num_in_link=max_indx_int, role='arrow')
+                    NewUlist = Univers_list(id_in=btn_link, id_out=str(vtask_id), num_in_link=max_indx_int, role='arrow')
                     # Univers_list.objects.create(id_in=btn_link, id_out=vtask_id, num_in_link=max_indx_int, role='arrow')
                     db.add(NewUlist)
                     db.commit()
