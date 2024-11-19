@@ -33,23 +33,23 @@
                       <select name="contact_role>{{linktask.id_num}}" id="contact_role>{{linktask.id_num}}">
                         <option value="">-- Выберите роль контакта --</option>
                         <option value="executor"
-                                {% if linktask.role == "executor" %}
+                                {% if linktask.role=="executor" %}
                                     selected
                                 {% endif %}
                         >Исполнитель</option>
                         <option value="target"
-                                {% if linktask.role == "target" %}
+                                {% if linktask.role=="target" %}
                                     selected
                                 {% endif %}
                         >Цель задачи</option>
                         <option value="controle"
-                                {% if linktask.role == "controle" %}
+                                {% if linktask.role=="controle" %}
                                     selected
                                 {% endif %}
 
                         >Контролер</option>
                         <option value="chief"
-                                {% if linktask.role == "chief" %}
+                                {% if linktask.role=="chief" %}
                                     selected
                                 {% endif %}
                         >Руководитель</option>
@@ -57,7 +57,7 @@
                     <button name="btn_role" id="btn_role" type="submit" value="{{linktask.id_num}}">
                         U
                     </button>
-                    <a href="/card_contact/{{ contact.id }}/">   {{linktask.last_name}} {{linktask.first_name}} {{linktask.second_name}} </a>
+                    <a href="/card_contact/{{ linktask.id }}/">   {{linktask.last_name}} {{linktask.first_name}} {{linktask.second_name}} </a>
                     <p>_________________________________________</p>
                 </div>
             {% endfor%}
