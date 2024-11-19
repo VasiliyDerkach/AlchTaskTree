@@ -283,7 +283,7 @@ def VCardTask(request, task_id):
             btn_unlink = request.POST.get('btn_unlink')
             if btn_unlink:
                 # Univers_list.objects.filter(id_in=btn_unlink,id_out=vtask_id).delete()
-                DUList = db.query(Univers_list).get(Univers_list.id_num==btn_unlink)
+                DUList = db.query(Univers_list).get(Univers_list.id_num==int(btn_unlink))
                 # db.execute(delete(Univers_list).where(Univers_list.id_in==btn_unlink and Univers_list.id_out==vtask_id))
                 if DUList:
                     db.delete(DUList)
@@ -369,7 +369,7 @@ def VContactsTask(request, task_id):
             if btn_unlink:
                 # Univers_list.objects.filter(id=btn_unlink).delete()
                 # db.execute(delete(Univers_list).where(Univers_list.id==btn_unlink ))
-                DUList = db.query(Univers_list).get(Univers_list.id_num==btn_unlink)
+                DUList = db.query(Univers_list).get(Univers_list.id_num==int(btn_unlink))
                 if DUList:
                     db.delete(DUList)
                     db.commit()
@@ -381,7 +381,7 @@ def VContactsTask(request, task_id):
                 # print(vrole)
                 vrole = request.POST.get(f"contact_role>{btn_role}")
                 # db.execute(update(Univers_list).where(Univers_list.id==Univers_list).values(Univers_list.role=vrole))
-                UpUList = db.query(Univers_list).filter(Univers_list.id_num==btn_role).first()
+                UpUList = db.query(Univers_list).filter(Univers_list.id_num==int(btn_role0).first()
                 UpUList.role = vrole
                 db.commit()
                 btn_role = None
