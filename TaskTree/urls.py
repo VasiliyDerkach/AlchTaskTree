@@ -24,6 +24,7 @@ urlpatterns = [
     path('addtask/',VCreateTask, name='addtask'),
     path('addcontact/',VCreateContact, name='addcontact'),
     path('card_task/<slug:task_id>/',VCardTask, name='card_task'),
+    path('task_contacts/<slug:contact_id>/card_contact/',VCardContact, name='card_contact'),
     path('edit_task/<slug:task_id>/',VEditTask, name='edit_task'),
     path('contacts/',PageContacts, name='contacts'),
     path('task_contacts/<slug:task_id>/',VContactsTask,name='task_contacts'),

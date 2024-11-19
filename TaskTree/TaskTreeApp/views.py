@@ -142,16 +142,17 @@ def PageContacts(request):
         # print(id_del)
         if id_del:
             # Contacts.objects.get(id=id_del).delete()
-            DContact = db.query(Contacts).filter(Contacts.id == uuid.UUID(id_del))
+            DContact = db.query(Contacts).filter(Contacts.id == uuid.UUID(id_del)).all()
             # db.execute(delete(Contacts).where(Contacts.id == id_del))
-            db.delete(DContact)
-            db.commit()
+            if DContact:
+                db.delete(DContact[0])
+                db.commit()
 
     # contacts_lst = Contacts.objects.filter(last_name__icontains=FindTitle)
     # count_contacts = contacts_lst.count()
 
     search = "%{}%".format(FindTitle)
-    contacts_lst = Contacts.query.filter(Contacts.last_name.like(search)).all()
+    contacts_lst = db.query(Contacts).filter(Contacts.last_name.like(search)).all()
     # count_contacts = Tasks.query(func.count(Tasks.id)).scalar()
     count_contacts = len(contacts_lst)
     if count_contacts == 0:
@@ -343,7 +344,7 @@ def VContactsTask(request, task_id):
     notlist_link_task = None
     if vtask_id:
         count_fulllink_task = len(db.query(Univers_list).filter(Univers_list.id_out == vtask_id, Univers_list.role!='arrow').all())
-        link_task = db.query(Univers_list).filter(id_out=vtask_id)
+        # link_task = db.query(Univers_list).filter(Univers_list.id_out==vtask_id)
         # count_fulllink_task = link_task.count()
         if request.method == 'POST':
             btn_find_unlink = request.POST.get('btn_find_unlink')
