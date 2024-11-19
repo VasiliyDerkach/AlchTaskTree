@@ -26,7 +26,7 @@
             <p>Исходящие задачи</p>
             {% for linktask in list_link_task %}
                 <div>
-                    <button name="btn_unlink" type="submit" value="{{linktask.id}}">
+                    <button name="btn_unlink" type="submit" value="{{linktask.id_num}}">
                         -x-
                     </button>
                     <a> {{linktask.title}} </a>

@@ -26,11 +26,11 @@
             <p>Прикрепленные контакты и роли, по условиям поиска</p>
             {% for linktask in list_link_task %}
                 <div>
-                    <button name="btn_unlink" type="submit" value="{{linktask.list_id}}">
+                    <button name="btn_unlink" type="submit" value="{{linktask.id_num}}">
                         -x-
                     </button>
-                      <label for="contact_role>{{linktask.list_id}}">Роль</label>
-                      <select name="contact_role>{{linktask.list_id}}" id="contact_role>{{linktask.list_id}}">
+                      <label for="contact_role>{{linktask.id_num}}">Роль</label>
+                      <select name="contact_role>{{linktask.id_num}}" id="contact_role>{{linktask.id_num}}">
                         <option value="">-- Выберите роль контакта --</option>
                         <option value="executor"
                                 {% if linktask.role == "executor" %}
@@ -54,7 +54,7 @@
                                 {% endif %}
                         >Руководитель</option>
                       </select>
-                    <button name="btn_role" id="btn_role" type="submit" value="{{linktask.list_id}}">
+                    <button name="btn_role" id="btn_role" type="submit" value="{{linktask.id_num}}">
                         U
                     </button>
                     <a href="card_contact/{{ contact.id }}/">   {{linktask.last_name}} {{linktask.first_name}} {{linktask.second_name}} </a>
