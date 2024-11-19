@@ -357,7 +357,9 @@ def VContactsTask(request, task_id):
         search = "%{}%".format(FindTitle)
         if count_fulllink_task>0:
 
-            flist_link_task = db.query(Contacts).join(Univers_list, Contacts.id == Univers_list.id_in).filter(Univers_list.id_out == vtask_id, Contacts.last_name.like(search)).all()
+            flist_link_task = db.query(Contacts).join(Univers_list, Contacts.id == Univers_list.id_in)
+            flist_link_task = flist_link_task.filter(Univers_list.id_out == vtask_id, Contacts.last_name.like(search))
+            flist_link_task = flist_link_task.add_columns(Univers_list.role,Contacts.id, Contacts.first_name,Contacts.last_name,Contacts.second_name, Univers_list.id_num).all()
             count_link_tasks = len(flist_link_task)
 
         else:

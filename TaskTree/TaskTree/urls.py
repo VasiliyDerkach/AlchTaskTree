@@ -24,5 +24,6 @@ urlpatterns = [
     path('contacts/',PageContacts, name='contacts'),
     path('task_contacts/<slug:task_id>/',VContactsTask,name='task_contacts'),
     path('contacts/card_contact/<slug:contact_id>/',VCardContact, name='card_contact'),
+    path('card_contact/<slug:contact_id>/', VCardContact, name='card_contact'),
 
 ]
