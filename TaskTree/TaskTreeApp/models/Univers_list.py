@@ -21,7 +21,7 @@ from ..backend.db import engine, Base
 from sqlalchemy import Column, Integer, String
 
 class Univers_list(Base):
-    __tablename__ = 'univers_list'
+    __tablename__ = 'Univers_list'
     __table_args__ = {'keep_existing': True}
     id = Column(Integer, primary_key=True, index=True)
     id_out =Column(String)
