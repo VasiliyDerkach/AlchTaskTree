@@ -301,10 +301,6 @@ def VCardTask(request, task_id):
 
     if vtask_id:
         lst_field_task = {'task_id': vtask_id, 'task_title': vtask_title, 'task_start': vtask_start, 'task_end': vtask_end}
-        # link_task = Univers_list.objects.filter(id_out=vtask_id)
-        # link_task =  db.scalar(select(Univers_list).where(Univers_list.id_out == vtask_id))
-        # count_fulllink_task = Univers_list.filter(Univers_list.id_out == vtask_id).query(
-        #     func.count(Univers_list.id)).scalar()
         count_fulllink_task = len(db.query(Univers_list).filter(Univers_list.id_out == vtask_id).all())
         # print('count_fulllink_task=',count_fulllink_task)
         # count_fulllink_task = link_task.count()
@@ -317,7 +313,6 @@ def VCardTask(request, task_id):
             if btn_find_tlink:
                 FindTitle = request.POST.get('FindTitle')
                 btn_find_tlink = None
-                # print('FindTitle=',FindTitle)
         search = "%{}%".format(FindTitle)
         search1 = "%{}%".format(FindTitleUnLink)
         if count_fulllink_task>0:
@@ -329,8 +324,6 @@ def VCardTask(request, task_id):
             count_link_tasks = len(flist_link_task)
         else:
             flist_link_task = None
-            # notlist_link_task = db.query(Tasks).filter(Tasks.id != uuid.UUID(vtask_id)).filter(Tasks.title.ilike(FindTitleUnLink))
-
             notlist_link_task = db.query(Tasks).filter(Tasks.id != vtask_id,Tasks.title.like(search1)).all()
         count_unlink_tasks = len(notlist_link_task)
         if request.method == 'POST':
@@ -349,15 +342,13 @@ def VCardTask(request, task_id):
 
             btn_link = request.POST.get('btn_link')
             if btn_link:
-                lstun = db.query(Univers_list).filter(Univers_list.id_in==uuid.UUID(btn_link), Univers_list.id_out==vtask_id,
+                lst_unlist = db.query(Univers_list).filter(Univers_list.id_in==uuid.UUID(btn_link), Univers_list.id_out==vtask_id,
                                                       Univers_list.role=='arrow').all()
-                # print('len.lstun=',len(lstun))
-                # if Univers_list.objects.filter(id_in=btn_link, id_out=vtask_id, role='arrow'):
-                if len(lstun)!=0:
+                if len(lst_unlist)!=0:
                     return HttpResponse("Задачи уже связаны")
                 else:
-                    lst3 = db.query(Univers_list).filter(Univers_list.id_out == vtask_id ,  Univers_list.role=='arrow').all()
-                    max_indx_int = len(lst3)
+                    lst_unlist_id = db.query(Univers_list).filter(Univers_list.id_out == vtask_id ,  Univers_list.role=='arrow').all()
+                    max_indx_int = len(lst_unlist_id)
                     if not max_indx_int:
                         max_indx_int = 0
                     max_indx_int += 1
@@ -407,17 +398,11 @@ def VContactsTask(request, task_id):
     lst_field_task = {'task_id': vtask_id, 'task_title': vtask_title, 'task_start': vtask_start, 'task_end': vtask_end}
     count_link_tasks = 0
     count_unlink_tasks = 0
-    # print(type(vtask_id),vtask_id,task_id)
-    # info_task = {}
-    # if vtask_id==task_id:
     FindTitleUnLink = ''
     FindTitle = ''
-    # lst_contacts_rol = []
     notlist_link_task = None
     if vtask_id:
         count_fulllink_task = len(db.query(Univers_list).filter(Univers_list.id_out == vtask_id, Univers_list.role!='arrow').all())
-        # link_task = db.query(Univers_list).filter(Univers_list.id_out==vtask_id)
-        # count_fulllink_task = link_task.count()
         if request.method == 'POST':
             btn_find_unlink = request.POST.get('btn_find_unlink')
             if btn_find_unlink:
@@ -427,7 +412,6 @@ def VContactsTask(request, task_id):
             if btn_find_tlink:
                 FindTitle = request.POST.get('FindTitle')
                 btn_find_tlink = None
-                # print('FindTitle=',FindTitle)
         search = "%{}%".format(FindTitle)
         if count_fulllink_task>0:
 
