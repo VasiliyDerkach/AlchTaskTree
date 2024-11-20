@@ -133,6 +133,10 @@ def MainPage(request):
         # print(id_del)
         if id_del:
             db.execute(delete(Tasks).where(Tasks.id == uuid.UUID(id_del)))
+            DelUList = db.query(Univers_list).filter(
+                or_(Univers_list.id_out == uuid.UUID(id_del), Univers_list.id_in == uuid.UUID(id_del)))
+            for delt in DelUList:
+                db.delete(delt)
             # db.delete(Dtask)
             db.commit()
     # t = db.query(Tasks)
@@ -170,7 +174,12 @@ def PageContacts(request):
             # db.execute(delete(Contacts).where(Contacts.id == id_del))
             if DContact:
                 db.delete(DContact[0])
+                # db.query(Univers_list).filter(or_(Univers_list.id_out == uuid.UUID(id_del),Univers_list.id_in == uuid.UUID(id_del))).delete(synchronize_session="fetch")
+                DelUList = db.query(Univers_list).filter(or_(Univers_list.id_out == uuid.UUID(id_del),Univers_list.id_in == uuid.UUID(id_del)))
+                for delt in DelUList:
+                    db.delete(delt)
                 db.commit()
+
 
     # contacts_lst = Contacts.objects.filter(last_name__icontains=FindTitle)
     # count_contacts = contacts_lst.count()
