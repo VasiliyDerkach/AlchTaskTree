@@ -74,6 +74,12 @@ from datetime import datetime
 db = DBSession
 # Base.metadata.create_all(engine)
 # db = get_db()
+"""
+    VCreateTask(request) - функция представления, вызывающая форму Django (class CreateTask),
+    для создания новой записи задачи (Tasks).
+    Передает в таблицу Tasks поля Текст задачи (title), Дата начала выполнения задачи Start,
+    Дата завершения задачи End.
+"""
 def VCreateTask(request):
     if request.method == 'POST':
         form = CreateTask(request.POST)
@@ -91,6 +97,11 @@ def VCreateTask(request):
     cont_form={'form': form}
     return render(request, 'create_contact.html',context=cont_form)
 # Create your views here.
+"""
+    VCreateContact(request) - функция, вызывающая форму Django (class CreateContact), для создания новой
+    записи в таблице Контакты (Contacts).
+    Передает в таблицу Contacts поля Фамилия - last_name, Имя - first_name, Отчество - second_name.
+"""
 def VCreateContact(request):
     if request.method == 'POST':
         form = CreateContact(request.POST)
@@ -106,6 +117,13 @@ def VCreateContact(request):
         form = CreateContact()
     cont_form={'form': form}
     return render(request, 'create_contact.html',context=cont_form)
+"""
+    MainPage(request) - функция, вызывающая html шаблон, для главной страницы проекта.
+    Страница вызывает список задач, рядом с заголовком задачи реализованы кнопки для удаления и редактирования задачи.
+    Также реализованы кнопки связывания задачи с другими задачами и кнопка связывания задачи с контактами.
+    Заголовки задач реализованы в виде ссылок на карточку для редактирования конкретной задачи.
+    Страница содержит поиск задачи по введенному пользователем контексту.
+"""
 def MainPage(request):
     FindTitle = ''
     if request.method == 'POST':
@@ -133,6 +151,12 @@ def MainPage(request):
     info_main = {'PageTitle': PageStr, 'tasks_list': tasks_lst,
                  'count_tasks': count_tasks, 'FindTitle': FindTitle}
     return render(request, 'main.html', context=info_main)
+"""
+    PageContacts(request) - функция, вызывающая html шаблон, для страницы со списком контактов (Contacts).
+    Страница содержит поиск контакта по введенной пользователем фамилии, кнопку для создания новгго контакта.
+    Реализованы кнопка удаления выбранного контакта. ФИО контакта реализованы, как ссылки на страницу
+    редактирования данных выборанного контакта.
+"""
 def PageContacts(request):
     FindTitle = ''
     if request.method == 'POST':
@@ -162,6 +186,10 @@ def PageContacts(request):
     info_main = {'PageTitle': PageStr, 'contacts_lst': contacts_lst,
                  'count_contacts': count_contacts, 'FindTitle': FindTitle}
     return render(request, 'contacts.html', context=info_main)
+"""
+    VCardContact(request, contact_id) - функция, вызывающая html шаблон, для страницы редактирования данных конаткта.
+    Атрибут contact_id - значение ключевого поля id таблицы контактов.
+"""
 def VCardContact(request, contact_id):
 
     VContact = db.query(Contacts).filter(Contacts.id == uuid.UUID(contact_id)).all()[0]
@@ -190,7 +218,11 @@ def VCardContact(request, contact_id):
     return render(request, 'card_contact.html', context={'contact': {'last_name': vlast_name,
                                                                      'first_name': vfirst_name,
                                                                      'second_name': vsecond_name}})
-
+"""
+    VEditTask(request, task_id)  - функция, вызывающая html шаблон, для страницы редактирования данных задачи.
+    Редактирование связей задач между собой и с контактами осуществляется в других функциях.
+    Атрибут task_id - значение ключевого поля id таблицы задач.
+"""
 def VEditTask(request, task_id):
     VTask = db.query(Tasks).filter_by(id = uuid.UUID(task_id)).all()
     # for u in VTask:
@@ -231,6 +263,20 @@ def VEditTask(request, task_id):
 
     return render(request, 'edit_task.html', context={'task': FTask})
 
+"""
+    VCardTask(request, task_id) - функция, вызывающая html шаблон, для страницы редактирования
+    данных о взаимсвязях задач между собой.
+    Атрибут task_id - значение ключевого поля id таблицы задач.
+    Страница содержит список связанных с данной задачей других задач той же таблицы.
+    Это аналог исходящих стрелок связи задач, от выбранной к указанным в списке.
+    Рядом с заголовком связанной задачи реализована кнопка удаления связи задач из таблицы связей Univers_list.
+    Страница содержит список задач, несвязанных с выбранной задачей. При этом исключается повторное связывание
+    двух задач однонаправленной связью. В списке отсутствует выбранная задача, т.к. исключено связывание задачи
+    самой с собой.
+    Напротив заголовка каждой несвязанной задачи реализована кнопка добавления связи задач, через добавление
+    соответствующей записи в таблицу Univers_list.
+    Реализованы поиски связанной задачи по контексту в ее загаловке и аналогично по списку несвязанных задач.
+"""
 def VCardTask(request, task_id):
     # find_task = Tasks.objects.filter(id=task_id)
     # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
@@ -321,6 +367,25 @@ def VCardTask(request, task_id):
                  'FindTitle': FindTitle,
                  'count_link_tasks': count_link_tasks,'count_unlink_tasks': count_unlink_tasks}
     return render(request,'card_task.html',context=info_task)
+"""
+    VContactsTask(request, task_id) - функция, вызывающая html шаблон, для страницы редактирования
+    данных о взаимсвязях задачи с контактами, а также ролевым значение этой взаимосвязи.
+    Атрибут task_id - значение ключевого поля id таблицы задач.
+    Страница содержит список связанных с данной задачей контактов и ролей взаимосвязи.
+    Это аналог исходящих стрелок связи задач, от выбранной к указанным в списке конатктам.
+    Рядом с заголовком связанного контакта  реализована кнопка удаления связи задачи и контакта
+    из таблицы связей Univers_list.
+    Там же реализован выпадающий список ролей взаимосвязи задачи и контакта (исполнитель, руководитель и т.п.) для
+    выбора роли для данной взаимосвязи. Рядом с данным выпадающим списком реализована кнопка сохранения данных о роли
+    в поле Role таблицы Univers_list.
+    Страница содержит список всех контактов. При этом не исключается повторное связывание
+    задач и контакта.
+
+    Напротив заголовка каждого несвязанного с задачей контакта  реализована кнопка добавления связи задачи и контакта,
+    через добавление соответствующей записи в таблицу Univers_list.
+    Реализованы поиски связанных контактов задачи по контексту фамилии в ее загаловке
+    и аналогично по списку несвязанных контактов.
+"""
 def VContactsTask(request, task_id):
     # vtask_id, vtask_title, vtask_start, vtask_end = db.scalar(select(Tasks.id,Tasks.title, Tasks.start, Tasks.end).where(Tasks.id == task_id))
     # find_task = Tasks.objects.filter(id=task_id)
